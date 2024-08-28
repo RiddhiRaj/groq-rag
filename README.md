@@ -1,5 +1,5 @@
 # ⚡GroqChat with Llama3-8B⚡
-This project is a Streamlit-based web application that leverages the power of Groq's Llama3 model and HuggingFace embeddings to create an intelligent document assistant. Users can upload PDFs, ask questions, and receive accurate answers based on the content of their documents.
+This web application, built with Streamlit, utilizes Groq's Llama3 model and HuggingFace embeddings to function as an intelligent document assistant. Users can upload PDFs, pose questions, and get precise answers derived from the document content.
 
 ## 🚀 Features
 
@@ -10,10 +10,10 @@ This project is a Streamlit-based web application that leverages the power of Gr
 
 ## 🛠️ Technologies Used
 
-- Streamlit
 - Langchain
 - Groq API (Llama3-8B model)
 - HuggingFace Embeddings
+- Streamlit
 - FAISS for vector storage
 - PyPDF for PDF processing
 
@@ -29,7 +29,7 @@ This project is a Streamlit-based web application that leverages the power of Gr
    git clone https://github.com/RiddhiRaj/groq-rag.git
    ```
    ```bash
-   cd groq-llama3-assistant
+   cd groq-rag
    ```
 
 2. Install the required packages:
