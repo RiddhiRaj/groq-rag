@@ -16,12 +16,16 @@ load_dotenv()
 # Load the API key for Groq
 groq_api_key = os.getenv('GROQ_API_KEY')
 
-st.title("GroqChat with Llama3⚡")
+st.set_page_config(page_title="⚡GroqChat with Llama3⚡", page_icon="⚡")
+
+st.title("⚡GroqChat with Llama3⚡")
 
 st.markdown("""
-* Click on "Process and Embed PDFs" to prepare the system.
-* Enter your question in the input box below.
-* View the answer and related document segments.
+**🔮Features :**
+
+* 🫵🏻 Click on "Process and Embed PDFs" to prepare the system.
+* ⌨️ Enter your question in the input box below.
+* 👀 View the answer and related document segments.
 """)
 
 llm = ChatGroq(groq_api_key=groq_api_key, model_name="Llama3-8b-8192")
@@ -37,40 +41,51 @@ prompt = ChatPromptTemplate.from_template(
 )
 
 def vector_embedding():
-    if "vectors" not in st.session_state:
-        # Use HuggingFaceEmbeddings instead of OpenAIEmbeddings
-        st.session_state.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-        st.session_state.loader = PyPDFDirectoryLoader("./pdfs")
-        st.session_state.docs = st.session_state.loader.load()
-        st.session_state.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-        st.session_state.final_documents = st.session_state.text_splitter.split_documents(st.session_state.docs[:20])
-        st.session_state.vectors = FAISS.from_documents(st.session_state.final_documents, st.session_state.embeddings)
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    loader = PyPDFDirectoryLoader("./pdfs")
+    docs = loader.load()
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+    final_documents = text_splitter.split_documents(docs[:20])
+    vectors = FAISS.from_documents(final_documents, embeddings)
+    return vectors
 
 if st.button("Process and Embed PDFs"):
-    vector_embedding()
-    st.success("Documents processed successfully and the Vector Store DB is ready! You can now ask questions.")
+    with st.spinner("Processing and embedding PDFs... This may take a moment."):
+        start_time = time.time()
+        st.session_state.vectors = vector_embedding()
+        end_time = time.time()
+        processing_time = end_time - start_time
+    st.session_state.success_message = f"Documents processed and embedded successfully in {processing_time:.2f} seconds. You can now ask questions."
 
-st.subheader("Get your thinking cap on & ask!🧠")
+# Display success message if it exists
+if 'success_message' in st.session_state:
+    st.success(st.session_state.success_message)
+
+st.subheader("Ask Here!🧠")
 
 prompt1 = st.text_input("Enter your question about the documents")
 
 if prompt1 and "vectors" in st.session_state:
-    document_chain = create_stuff_documents_chain(llm, prompt)
-    retriever = st.session_state.vectors.as_retriever()
-    retrieval_chain = create_retrieval_chain(retriever, document_chain)
-    start = time.process_time()
-    response = retrieval_chain.invoke({'input': prompt1})
-    print("Response time:", time.process_time() - start)
+    with st.spinner("Generating answer..."):
+        document_chain = create_stuff_documents_chain(llm, prompt)
+        retriever = st.session_state.vectors.as_retriever()
+        retrieval_chain = create_retrieval_chain(retriever, document_chain)
+        start_time = time.time()
+        response = retrieval_chain.invoke({'input': prompt1})
+        end_time = time.time()
+        response_time = end_time - start_time
     
     st.subheader("Answer:")
     st.write(response['answer'])
     
+    st.info(f"Response time: {response_time:.2f} seconds")
+    
     # With a streamlit expander
-    with st.expander("Related Document Segments"):
+    with st.expander("🔎Related Document Segments"):
         # Find the relevant chunks
         for i, doc in enumerate(response["context"]):
             st.markdown(f"**Segment {i+1}:**")
             st.write(doc.page_content)
             st.markdown("---")
 elif prompt1:
-    st.warning("Please process the documents first by clicking the 'Process Documents' button.")
+    st.warning("Please process the documents first by clicking the 'Process and Embed PDFs' button.")
