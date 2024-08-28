@@ -57,15 +57,14 @@ if st.button("Documents Embedding"):
     st.write("Vector Store DB is Ready")
 
 
-document_chain = create_stuff_documents_chain(llm, prompt)
-retriever=st.session_state.vectors.as_retriever()
-retrieval_chain=create_retrieval_chain(retriever,document_chain)
-
 if prompt1:
-    start = time.process_time()
-    response=retrieval_chain.invoke({"input":prompt1})
-    print("Response time: ", time.process_time() - start)
-    st.write(response["answer"])
+    document_chain=create_stuff_documents_chain(llm,prompt)
+    retriever=st.session_state.vectors.as_retriever()
+    retrieval_chain=create_retrieval_chain(retriever,document_chain)
+    start=time.process_time()
+    response=retrieval_chain.invoke({'input':prompt1})
+    print("Response time :",time.process_time()-start)
+    st.write(response['answer'])
 
     # With a streamlit expander
     with st.expander("Document Similarity Search"):
