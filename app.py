@@ -16,7 +16,13 @@ load_dotenv()
 # Load the API key for Groq
 groq_api_key = os.getenv('GROQ_API_KEY')
 
-st.title("Groq with Llama3")
+st.title("GroqChat with Llama3⚡")
+
+st.markdown("""
+* Click on "Process and Embed PDFs" to prepare the system.
+* Enter your question in the input box below.
+* View the answer and related document segments.
+""")
 
 llm = ChatGroq(groq_api_key=groq_api_key, model_name="Llama3-8b-8192")
 
@@ -40,24 +46,31 @@ def vector_embedding():
         st.session_state.final_documents = st.session_state.text_splitter.split_documents(st.session_state.docs[:20])
         st.session_state.vectors = FAISS.from_documents(st.session_state.final_documents, st.session_state.embeddings)
 
-prompt1 = st.text_input("Enter Your Question From Documents")
-
-if st.button("Documents Embedding"):
+if st.button("Process and Embed PDFs"):
     vector_embedding()
-    st.write("Vector Store DB is Ready")
+    st.success("Documents processed successfully and the Vector Store DB is ready! You can now ask questions.")
 
-if prompt1:
+st.subheader("Get your thinking cap on & ask!🧠")
+
+prompt1 = st.text_input("Enter your question about the documents")
+
+if prompt1 and "vectors" in st.session_state:
     document_chain = create_stuff_documents_chain(llm, prompt)
     retriever = st.session_state.vectors.as_retriever()
     retrieval_chain = create_retrieval_chain(retriever, document_chain)
     start = time.process_time()
     response = retrieval_chain.invoke({'input': prompt1})
     print("Response time:", time.process_time() - start)
+    
+    st.subheader("Answer:")
     st.write(response['answer'])
-
+    
     # With a streamlit expander
-    with st.expander("Document Similarity Search"):
+    with st.expander("Related Document Segments"):
         # Find the relevant chunks
         for i, doc in enumerate(response["context"]):
+            st.markdown(f"**Segment {i+1}:**")
             st.write(doc.page_content)
-            st.write("--------------------------------")
+            st.markdown("---")
+elif prompt1:
+    st.warning("Please process the documents first by clicking the 'Process Documents' button.")
