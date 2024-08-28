@@ -1,5 +1,5 @@
 # ⚡GroqChat with Llama3-8B⚡
-This web application, built with Streamlit, utilizes Groq's Llama3 model and HuggingFace embeddings to function as an intelligent document assistant. Users can upload PDFs, pose questions, and get precise answers derived from the document content.
+This web application, powered by Streamlit, implements a Retrieval-Augmented Generation (RAG) system to function as an intelligent document assistant. It leverages Groq API's Llama3-8B for natural language processing and generation, alongside HuggingFace's sentence-transformers for document embedding. The application utilizes LangChain for seamless integration of various NLP components, including FAISS for efficient vector storage and retrieval.
 
 ## 🚀 Features
 
