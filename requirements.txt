@@ -1,15 +1,13 @@
-langchain-openai
 langchain
 langchain-core
 python-dotenv
 streamlit
 langchain-text-splitters
 langchain-community
-langserve
 pypdf
 faiss-cpu
 groq
 langchain-groq
 langchainhub
 PyPDF2
-langchain-objectbox
+sentence-transformers
