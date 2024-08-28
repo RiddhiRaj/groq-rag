@@ -1,8 +1,10 @@
-langchain_openai 
-langchain_core
+langchain-openai
+langchain
+langchain-core
 python-dotenv
 streamlit
-langchain_community
+langchain-text-splitters
+langchain-community
 langserve
 pypdf
 faiss-cpu
